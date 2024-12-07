@@ -2,8 +2,9 @@ package calculadorainvoker
 
 import (
 	"log"
+	"math/rand"
 	"test/myrpc/app/businesses/calculadora"
-	qosobserver "test/myrpc/distribution/interceptors/qos"
+	"test/myrpc/distribution/interceptors/locationforwarder"
 	"test/myrpc/distribution/marshaller"
 	"test/myrpc/distribution/miop"
 	"test/myrpc/infrastructure/srh"
@@ -27,12 +28,20 @@ func (i CalculadoraInvoker) Invoke() {
 	miopPacket := miop.Packet{}
 	var rep int
 
-	// Create an instance of Calculadora - Static Instance
+	locationForwarder := locationforwarder.LocationForwarder{}
 	c := calculadora.Calculadora{}
 
 	for {
+		log.Print("Received!")
+
 		// Invoke SRH
 		b := s.Receive()
+
+		isAvailable := rand.Intn(2) == 1
+
+		if !isAvailable {
+			locationForwarder.GetLocation("Calculator")
+		}
 
 		// Unmarshall miop packet
 		miopPacket = m.Unmarshall(b)
@@ -43,9 +52,7 @@ func (i CalculadoraInvoker) Invoke() {
 		_p1 := int(r.Params[0].(float64))
 		_p2 := int(r.Params[1].(float64))
 
-		// Demultiplex request & invoke QoS Observer
-		qosObserver := qosobserver.QoSObserver{}
-		qosObserver.StartTime()
+		// Demultiplex request & invoke Location Forwarder
 		switch r.Op {
 		case "Som":
 			rep = c.Som(_p1, _p2)
@@ -58,7 +65,6 @@ func (i CalculadoraInvoker) Invoke() {
 		default:
 			log.Fatal("Invoker:: Operation '" + r.Op + "' is unknown:: ")
 		}
-		qosObserver.StopTime()
 
 		// Prepare reply
 		var params []interface{}
