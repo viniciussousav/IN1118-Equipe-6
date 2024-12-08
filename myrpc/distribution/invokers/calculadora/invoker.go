@@ -2,7 +2,6 @@ package calculadorainvoker
 
 import (
 	"log"
-	"math/rand"
 	"test/myrpc/app/businesses/calculadora"
 	"test/myrpc/distribution/core"
 	"test/myrpc/distribution/interceptors"
@@ -11,23 +10,23 @@ import (
 )
 
 type Invoker struct {
-	Ior shared.IOR
+	ior               shared.IOR
+	locationForwarder *interceptors.LocationForwarder
 }
 
-func NewInvoker(h string, p int) Invoker {
-	ior := shared.IOR{Host: h, Port: p}
-	inv := Invoker{Ior: ior}
-
-	return inv
+func NewInvoker(host string, port int, locationForwarder *interceptors.LocationForwarder) Invoker {
+	return Invoker{
+		ior:               shared.IOR{Host: host, Port: port},
+		locationForwarder: locationForwarder}
 }
 
 func (i Invoker) Invoke() {
-	s := infrastructure.NewServerRequestHandler(i.Ior.Host, i.Ior.Port)
+	s := infrastructure.NewServerRequestHandler(i.ior.Host, i.ior.Port)
 	m := core.Marshaller{}
-	miopPacket := core.Packet{}
+	packet := core.Packet{}
+
 	var rep int
 
-	locationForwarder := interceptors.LocationForwarder{}
 	c := calculadora.Calculadora{}
 
 	for {
@@ -36,17 +35,30 @@ func (i Invoker) Invoke() {
 		// Invoke ServerRequestHandler
 		b := s.Receive()
 
-		isAvailable := rand.Intn(2) == 1
+		/*
+			isAvailable := rand.Intn(2) == 1
 
-		if !isAvailable {
-			locationForwarder.GetLocation("Calculator")
-		}
+			if !isAvailable {
+				log.Print("Object not available locally. Forwarding request...")
+
+				// Redireciona a requisição para o servidor remoto
+				response, err := i.locationForwarder.ForwardRequest("Calculadora", b)
+				if err != nil {
+					log.Printf("Failed to forward request: %v", err)
+					continue
+				}
+
+				// Processa a resposta recebida do servidor remoto
+				log.Printf("Response from remote server: %s", string(response))
+				continue
+			}
+		*/
 
 		// Unmarshall miop packet
-		miopPacket = m.Unmarshall(b)
+		packet = m.Unmarshall(b)
 
 		// Extract request from publisher
-		r := core.ExtractRequest(miopPacket)
+		r := core.ExtractRequest(packet)
 
 		_p1 := int(r.Params[0].(float64))
 		_p2 := int(r.Params[1].(float64))

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"test/myrpc/distribution/proxies/calculadora"
 	namingproxy "test/myrpc/services/naming/proxy"
 	"test/shared"
@@ -15,18 +14,6 @@ func main() {
 
 func Cliente() {
 
-	ClientePerf()
-	os.Exit(0)
-
-	// Obtain proxies
-	naming := namingproxy.New(shared.LocalHost, shared.NamingPort)
-	calc := calculadoraproxy.NewCalculadoraProxy(naming.Find("Calculadora"))
-
-	// Chamada remota a Calculadora
-	fmt.Println(calc.Som(1, 2))
-}
-
-func ClientePerf() {
 	naming := namingproxy.New(shared.LocalHost, shared.NamingPort)
 	calc := calculadoraproxy.NewCalculadoraProxy(naming.Find("Calculadora"))
 
@@ -38,5 +25,5 @@ func ClientePerf() {
 		fmt.Println(i, ";", time.Now().Sub(t1).Milliseconds())
 		time.Sleep(100 * time.Millisecond)
 	}
-	fmt.Println("Experiemnt finalised...")
+	fmt.Println("Experiment finished...")
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"test/myrpc/distribution/interceptors"
 	invoker "test/myrpc/distribution/invokers/calculadora"
 	namingproxy "test/myrpc/services/naming/proxy"
 	"test/shared"
@@ -22,11 +23,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Create instance of location forwarder
+	locationForwarder := interceptors.NewLocationForwarder()
+
 	// Create instance of invokers
-	inv := invoker.NewInvoker(shared.LocalHost, calcPort)
+	inv := invoker.NewInvoker(shared.LocalHost, calcPort, &locationForwarder)
 
 	// Register services in Naming
-	naming.Bind("Calculadora", shared.NewIOR(inv.Ior.Host, inv.Ior.Port))
+	naming.Bind("Calculadora", shared.NewIOR(shared.LocalHost, calcPort))
 
 	// Invoke services
 	inv.Invoke()
