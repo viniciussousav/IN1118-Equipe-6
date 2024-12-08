@@ -1,4 +1,4 @@
-package miop
+package core
 
 import (
 	"test/shared"

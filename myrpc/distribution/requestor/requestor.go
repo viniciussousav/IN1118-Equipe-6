@@ -1,9 +1,8 @@
 package requestor
 
 import (
-	"test/myrpc/distribution/marshaller"
-	"test/myrpc/distribution/miop"
-	"test/myrpc/infrastructure/crh"
+	"test/myrpc/distribution/core"
+	"test/myrpc/infrastructure"
 	"test/shared"
 )
 
@@ -16,19 +15,19 @@ func NewRequestor() Requestor {
 
 func (Requestor) Invoke(i shared.Invocation) shared.Termination {
 	// 1. Create MIOP packet
-	miopReqPacket := miop.CreateRequestMIOP(i.Request.Op, i.Request.Params)
+	miopReqPacket := core.CreateRequestMIOP(i.Request.Op, i.Request.Params)
 
 	// 2. Serialise MIOP packet
-	m := marshaller.Marshaller{}
+	m := core.Marshaller{}
 	b := m.Marshall(miopReqPacket)
 
-	// 3. Create & invoke CRH
-	c := crh.NewCRH(i.Ior.Host, i.Ior.Port)
-	r := c.SendReceive(b)
+	// 3. Create & invoke ClientRequestHandler
+	c := infrastructure.NewClientRequestHandler(i.Ior.Host, i.Ior.Port)
+	r := c.Handle(b)
 
 	// 4. Extract reply from subscriber
 	miopRepPacket := m.Unmarshall(r)
-	rt := miop.ExtractReply(miopRepPacket)
+	rt := core.ExtractReply(miopRepPacket)
 
 	t := shared.Termination{Rep: rt}
 

@@ -1,17 +1,15 @@
 package calculadoraproxy
 
 import (
-	"test/myrpc/distribution/core"
 	"test/myrpc/distribution/requestor"
 	"test/shared"
 )
 
 type CalculadoraProxy struct {
-	Ior   shared.IOR
-	_Core core.Core
+	Ior shared.IOR
 }
 
-func New(i shared.IOR) CalculadoraProxy {
+func NewCalculadoraProxy(i shared.IOR) CalculadoraProxy {
 	r := CalculadoraProxy{Ior: i}
 	return r
 }
@@ -37,7 +35,7 @@ func (p *CalculadoraProxy) Som(p1, p2 int) int {
 	return int(r.Rep.Result[0].(float64))
 }
 
-func (h *CalculadoraProxy) Dif(p1, p2 int) int {
+func (p *CalculadoraProxy) Dif(p1, p2 int) int {
 
 	// 1. Configure input parameters
 	params := make([]interface{}, 2)
@@ -48,7 +46,7 @@ func (h *CalculadoraProxy) Dif(p1, p2 int) int {
 	req := shared.Request{Op: "Dif", Params: params}
 
 	// Prepare invocation to Requestor
-	inv := shared.Invocation{Ior: h.Ior, Request: req}
+	inv := shared.Invocation{Ior: p.Ior, Request: req}
 
 	// 3. Invoke Requestor
 	requestor := requestor.Requestor{}
@@ -58,7 +56,7 @@ func (h *CalculadoraProxy) Dif(p1, p2 int) int {
 	return int(r.Rep.Result[0].(float64)) // TODO
 }
 
-func (h *CalculadoraProxy) Mul(p1, p2 int) int {
+func (p *CalculadoraProxy) Mul(p1, p2 int) int {
 
 	// 1. Configure input parameters
 	params := make([]interface{}, 2)
@@ -69,7 +67,7 @@ func (h *CalculadoraProxy) Mul(p1, p2 int) int {
 	req := shared.Request{Op: "Mul", Params: params}
 
 	// Prepare invocation to Requestor
-	inv := shared.Invocation{Ior: h.Ior, Request: req}
+	inv := shared.Invocation{Ior: p.Ior, Request: req}
 
 	// 3. Invoke Requestor
 	requestor := requestor.Requestor{}
@@ -79,7 +77,7 @@ func (h *CalculadoraProxy) Mul(p1, p2 int) int {
 	return int(r.Rep.Result[0].(float64)) // TODO
 }
 
-func (h *CalculadoraProxy) Div(p1, p2 int) int {
+func (p *CalculadoraProxy) Div(p1, p2 int) int {
 
 	// 1. Configure input parameters
 	params := make([]interface{}, 2)
@@ -90,7 +88,7 @@ func (h *CalculadoraProxy) Div(p1, p2 int) int {
 	req := shared.Request{Op: "Div", Params: params}
 
 	// Prepare invocation to Requestor
-	inv := shared.Invocation{Ior: h.Ior, Request: req}
+	inv := shared.Invocation{Ior: p.Ior, Request: req}
 
 	// 3. Invoke Requestor
 	requestor := requestor.Requestor{}

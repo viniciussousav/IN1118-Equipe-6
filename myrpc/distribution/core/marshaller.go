@@ -1,15 +1,14 @@
-package marshaller
+package core
 
 import (
 	"encoding/gob"
 	"encoding/json"
 	"log"
-	"test/myrpc/distribution/miop"
 )
 
 type Marshaller struct{}
 
-func (Marshaller) Marshall(msg miop.Packet) []byte {
+func (Marshaller) Marshall(msg Packet) []byte {
 
 	r, err := json.Marshal(msg)
 	//r, err := msgpack.Marshal(msg)
@@ -20,9 +19,9 @@ func (Marshaller) Marshall(msg miop.Packet) []byte {
 	return r
 }
 
-func (Marshaller) Unmarshall(msg []byte) miop.Packet {
+func (Marshaller) Unmarshall(msg []byte) Packet {
 
-	r := miop.Packet{}
+	r := Packet{}
 	err := json.Unmarshal(msg, &r)
 	//err := msgpack.Unmarshal(msg, &r)
 	if err != nil {
@@ -32,7 +31,7 @@ func (Marshaller) Unmarshall(msg []byte) miop.Packet {
 }
 
 func (Marshaller) MarshallerFactory() Marshaller {
-	gob.Register(miop.Packet{})
+	gob.Register(Packet{})
 
 	return Marshaller{}
 }

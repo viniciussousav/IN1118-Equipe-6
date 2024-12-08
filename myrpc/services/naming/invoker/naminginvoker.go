@@ -2,9 +2,8 @@ package naminginvoker
 
 import (
 	"log"
-	"test/myrpc/distribution/marshaller"
-	"test/myrpc/distribution/miop"
-	"test/myrpc/infrastructure/srh"
+	"test/myrpc/distribution/core"
+	"test/myrpc/infrastructure"
 	"test/myrpc/services/naming"
 	"test/shared"
 )
@@ -20,23 +19,23 @@ func New(h string, p int) Invoker {
 }
 
 func (i Invoker) Invoke() {
-	s := srh.NewSRH(i.Ior.Host, i.Ior.Port)
-	m := marshaller.Marshaller{}
-	miopPacket := miop.Packet{}
+	s := infrastructure.NewServerRequestHandler(i.Ior.Host, i.Ior.Port)
+	m := core.Marshaller{}
+	miopPacket := core.Packet{}
 	var rep interface{}
 
 	// Create an instance of Calculadora
 	n := naming.NamingService{}
 
 	for {
-		// Invoke SRH
+		// Invoke ServerRequestHandler
 		b := s.Receive()
 
 		// Unmarshall miop packet
 		miopPacket = m.Unmarshall(b)
 
 		// Extract request from publisher
-		r := miop.ExtractRequest(miopPacket)
+		r := core.ExtractRequest(miopPacket)
 
 		// Demultiplex request
 		switch r.Op {
@@ -60,7 +59,7 @@ func (i Invoker) Invoke() {
 		params = append(params, rep)
 
 		// Create miop reply packet
-		miop := miop.CreateReplyMIOP(params)
+		miop := core.CreateReplyMIOP(params)
 
 		// Marshall miop packet
 		b = m.Marshall(miop)

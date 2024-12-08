@@ -1,4 +1,4 @@
-package locationforwarder
+package interceptors
 
 import "test/shared"
 

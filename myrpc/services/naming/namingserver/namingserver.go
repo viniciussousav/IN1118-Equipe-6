@@ -32,7 +32,7 @@ func calcServer() {
 	naming := namingproxy.New(shared.LocalHost, shared.NamingPort)
 
 	// Create invoker of messagingservice
-	calcInv := calculadorainvoker.New(shared.LocalHost, shared.CalculadoraPort)
+	calcInv := calculadorainvoker.NewInvoker(shared.LocalHost, shared.CalculadoraPort)
 
 	// Register Calculadora in Naming subscriber
 	calcIor := shared.NewIOR(calcInv.Ior.Host, calcInv.Ior.Port)
@@ -44,7 +44,7 @@ func calcServer() {
 
 func calcClient() {
 	naming := namingproxy.New(shared.LocalHost, shared.NamingPort)
-	calc := calculadoraproxy.New(naming.Find("Calculadora"))
+	calc := calculadoraproxy.NewCalculadoraProxy(naming.Find("Calculadora"))
 
 	for i := 0; i < 100; i++ {
 		fmt.Println(calc.Som(i, i))

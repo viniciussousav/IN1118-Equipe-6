@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-	calculadorainvoker "test/myrpc/distribution/invokers/calculadora"
+	invoker "test/myrpc/distribution/invokers/calculadora"
 	namingproxy "test/myrpc/services/naming/proxy"
 	"test/shared"
 )
@@ -23,11 +23,11 @@ func main() {
 	}
 
 	// Create instance of invokers
-	calcInv := calculadorainvoker.New(shared.LocalHost, calcPort)
+	inv := invoker.NewInvoker(shared.LocalHost, calcPort)
 
 	// Register services in Naming
-	naming.Bind("Calculadora", shared.NewIOR(calcInv.Ior.Host, calcInv.Ior.Port))
+	naming.Bind("Calculadora", shared.NewIOR(inv.Ior.Host, inv.Ior.Port))
 
 	// Invoke services
-	calcInv.Invoke()
+	inv.Invoke()
 }
