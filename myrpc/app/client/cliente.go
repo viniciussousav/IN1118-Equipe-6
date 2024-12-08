@@ -1,29 +1,36 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"test/myrpc/distribution/proxies/calculadora"
+	"os"
+	"strconv"
+	"test/myrpc/distribution/proxies"
 	namingproxy "test/myrpc/services/naming/proxy"
 	"test/shared"
-	"time"
 )
 
 func main() {
-	Cliente()
-}
-
-func Cliente() {
 
 	naming := namingproxy.New(shared.LocalHost, shared.NamingPort)
-	calc := calculadoraproxy.NewCalculadoraProxy(naming.Find("Calculadora"))
+	calc := proxies.NewCalculadoraProxy(naming.Find("Calculadora"))
 
-	for i := 0; i < shared.StatisticSample; i++ {
-		t1 := time.Now()
-		for j := 0; j < shared.SampleSize; j++ {
-			calc.Som(1, 2)
-		}
-		fmt.Println(i, ";", time.Now().Sub(t1).Milliseconds())
-		time.Sleep(100 * time.Millisecond)
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		var a, b int
+
+		fmt.Print("Type first number: ")
+		scanner.Scan()
+		a, _ = strconv.Atoi(scanner.Text())
+
+		fmt.Print("Type second number: ")
+		scanner.Scan()
+		b, _ = strconv.Atoi(scanner.Text())
+
+		res := calc.Som(a, b)
+		fmt.Println("Response: ", res)
+
+		fmt.Println()
 	}
-	fmt.Println("Experiment finished...")
 }

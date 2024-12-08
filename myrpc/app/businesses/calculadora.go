@@ -1,4 +1,4 @@
-package calculadora
+package businesses
 
 type Calculadora struct{}
 

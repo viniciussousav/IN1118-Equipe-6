@@ -46,7 +46,7 @@ type ReplyBody struct {
 	OperationResult []interface{}
 }
 
-func CreateRequestMIOP(op string, p []interface{}) Packet {
+func CreateRequestPackage(op string, p []interface{}) Packet {
 	r := Packet{}
 
 	miopHeader := Header{}
@@ -61,17 +61,17 @@ func CreateRequestMIOP(op string, p []interface{}) Packet {
 	return r
 }
 
-func CreateReplyMIOP(params []interface{}) Packet {
+func CreateReplyPacket(params []interface{}) Packet {
 	r := Packet{}
 
-	miopHeader := Header{}
-	miopBody := Body{}
+	header := Header{}
+	body := Body{}
 	repHeader := ReplyHeader{"", 1313, 1} // TODO
 	repBody := ReplyBody{OperationResult: params}
-	miopBody = Body{RepHeader: repHeader, RepBody: repBody}
+	body = Body{RepHeader: repHeader, RepBody: repBody}
 
-	r.Hdr = miopHeader
-	r.Bd = miopBody
+	r.Hdr = header
+	r.Bd = body
 
 	return r
 }

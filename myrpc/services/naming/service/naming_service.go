@@ -1,4 +1,4 @@
-package naming
+package naming_service
 
 import (
 	"test/shared"

@@ -1,10 +1,11 @@
 package naminginvoker
 
 import (
+	"fmt"
 	"log"
 	"test/myrpc/distribution/core"
 	"test/myrpc/infrastructure"
-	"test/myrpc/services/naming"
+	"test/myrpc/services/naming/service"
 	"test/shared"
 )
 
@@ -21,21 +22,21 @@ func New(h string, p int) Invoker {
 func (i Invoker) Invoke() {
 	s := infrastructure.NewServerRequestHandler(i.Ior.Host, i.Ior.Port)
 	m := core.Marshaller{}
-	miopPacket := core.Packet{}
+	packet := core.Packet{}
 	var rep interface{}
 
 	// Create an instance of Calculadora
-	n := naming.NamingService{}
+	n := naming_service.NamingService{}
 
 	for {
 		// Invoke ServerRequestHandler
 		b := s.Receive()
 
 		// Unmarshall miop packet
-		miopPacket = m.Unmarshall(b)
+		packet = m.Unmarshall(b)
 
 		// Extract request from publisher
-		r := core.ExtractRequest(miopPacket)
+		r := core.ExtractRequest(packet)
 
 		// Demultiplex request
 		switch r.Op {
@@ -58,13 +59,15 @@ func (i Invoker) Invoke() {
 		var params []interface{}
 		params = append(params, rep)
 
-		// Create miop reply packet
-		miop := core.CreateReplyMIOP(params)
+		// Create reply packet
+		replyPacket := core.CreateReplyPacket(params)
 
-		// Marshall miop packet
-		b = m.Marshall(miop)
+		// Marshall packet
+		b = m.Marshall(replyPacket)
 
 		// Send marshalled packet
 		s.Send(b)
+
+		fmt.Println("Services: ", n.List())
 	}
 }

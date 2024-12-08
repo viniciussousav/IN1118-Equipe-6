@@ -1,4 +1,4 @@
-package calculadoraproxy
+package proxies
 
 import (
 	"test/myrpc/distribution/requestor"

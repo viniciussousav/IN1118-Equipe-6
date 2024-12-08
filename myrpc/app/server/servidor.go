@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 	"test/myrpc/distribution/interceptors"
-	invoker "test/myrpc/distribution/invokers/calculadora"
+	invoker "test/myrpc/distribution/invokers"
 	namingproxy "test/myrpc/services/naming/proxy"
 	"test/shared"
 )

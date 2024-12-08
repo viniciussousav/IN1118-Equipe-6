@@ -1,8 +1,8 @@
-package calculadorainvoker
+package invokers
 
 import (
 	"log"
-	"test/myrpc/app/businesses/calculadora"
+	"test/myrpc/app/businesses"
 	"test/myrpc/distribution/core"
 	"test/myrpc/distribution/interceptors"
 	"test/myrpc/infrastructure"
@@ -27,10 +27,9 @@ func (i Invoker) Invoke() {
 
 	var rep int
 
-	c := calculadora.Calculadora{}
+	c := businesses.Calculadora{}
 
 	for {
-		log.Print("Received!")
 
 		// Invoke ServerRequestHandler
 		b := s.Receive()
@@ -54,11 +53,12 @@ func (i Invoker) Invoke() {
 			}
 		*/
 
-		// Unmarshall miop packet
+		// Unmarshall packet
 		packet = m.Unmarshall(b)
 
 		// Extract request from publisher
 		r := core.ExtractRequest(packet)
+		log.Print("Request received:", r)
 
 		_p1 := int(r.Params[0].(float64))
 		_p2 := int(r.Params[1].(float64))
@@ -81,11 +81,11 @@ func (i Invoker) Invoke() {
 		var params []interface{}
 		params = append(params, rep)
 
-		// Create miop reply packet
-		miop := core.CreateReplyMIOP(params)
+		// Create reply packet
+		replyPacket := core.CreateReplyPacket(params)
 
-		// Marshall miop packet
-		b = m.Marshall(miop)
+		// Marshall packet
+		b = m.Marshall(replyPacket)
 
 		// Send marshalled packet
 		s.Send(b)
