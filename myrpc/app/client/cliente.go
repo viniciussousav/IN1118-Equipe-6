@@ -42,10 +42,10 @@ func listenUserInput(calc proxies.CalculadoraProxy) {
 		if statusCode == 200 {
 			fmt.Printf("StatusCode: %d, Result: %.2f \n", statusCode, res.Result[0].(float64))
 		} else if statusCode == 301 {
-			newLocationPort := res.Result[0].(int)
+			newLocationPort := int(res.Result[0].(float64))
 			redirectProxy := proxies.NewCalculadoraProxy(shared.IOR{Host: shared.LocalHost, Port: newLocationPort})
 			statusCode, res = redirectProxy.Som(a, b)
-			fmt.Printf("Result: %.2f \n", res.Result[0].(float64))
+			fmt.Printf("Result from new location: %.2f \n", res.Result[0].(float64))
 		} else {
 			fmt.Printf("StatusCode: %d, Error: %s \n", statusCode, res.Result[0].(string))
 		}
