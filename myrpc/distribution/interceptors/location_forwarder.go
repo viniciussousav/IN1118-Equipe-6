@@ -1,6 +1,7 @@
 package interceptors
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"net"
@@ -15,7 +16,7 @@ type LocationForwarder struct {
 func NewLocationForwarder() LocationForwarder {
 	return LocationForwarder{
 		RemoteLocations: map[string]shared.IOR{
-			"Calculator": {Host: "localhost", Port: 8082},
+			"Calculadora": {Host: "localhost", Port: 8082},
 		},
 	}
 }
@@ -44,18 +45,35 @@ func (lf *LocationForwarder) ForwardRequest(objectName string, request []byte) (
 	}
 	defer conn.Close()
 
-	// Envia a requisição ao servidor remoto
+	// 2: send message's size
+	sizeMsgToServer := make([]byte, 4)
+	l := uint32(len(request))
+	binary.LittleEndian.PutUint32(sizeMsgToServer, l)
+	_, err = conn.Write(sizeMsgToServer)
+	if err != nil {
+		log.Fatalf("ClientRequestHandler 1:: %s", err)
+	}
+
+	// 3: send message
 	_, err = conn.Write(request)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %v", err)
+		log.Fatalf("ClientRequestHandler 2:: %s", err)
 	}
 
-	// Recebe a resposta do servidor remoto
-	response := make([]byte, 1024)
-	n, err := conn.Read(response)
+	// 4: receive message's size
+	sizeMsgFromServer := make([]byte, 4)
+	_, err = conn.Read(sizeMsgFromServer)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %v", err)
+		log.Fatalf("ClientRequestHandler 3:: %s", err)
+	}
+	sizeFromServerInt := binary.LittleEndian.Uint32(sizeMsgFromServer)
+
+	//5: receive reply
+	msgFromServer := make([]byte, sizeFromServerInt)
+	_, err = conn.Read(msgFromServer)
+	if err != nil {
+		log.Fatalf("ClientRequestHandler 4:: %s", err)
 	}
 
-	return response[:n], nil
+	return msgFromServer, nil
 }

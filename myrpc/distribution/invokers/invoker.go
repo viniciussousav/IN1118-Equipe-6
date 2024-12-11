@@ -18,7 +18,7 @@ type Invoker struct {
 func NewInvoker(host string, port int, locationForwarder *interceptors.LocationForwarder) Invoker {
 
 	localObject := map[string]interface{}{
-		"Calculadora1": businesses.Calculadora{},
+		"Calculadora": businesses.Calculadora{},
 	}
 
 	return Invoker{
@@ -48,19 +48,29 @@ func (i Invoker) Invoke() {
 		c, exists := i.localObjects[r.ObjKey]
 
 		if !exists {
-			// Prepare reply
-			var params []interface{}
-			params = append(params, "object not found")
 
-			// Create reply packet
-			replyPacket := core.CreateReplyPacket(params, 404)
+			red, err := i.locationForwarder.ForwardRequest("Calculadora", b)
 
-			// Marshall packet
-			b = m.Marshall(replyPacket)
+			if err != nil {
+				// Prepare reply
+				var params []interface{}
+				params = append(params, "object not found")
 
-			// Send marshalled packet
-			s.Send(b)
-			log.Print("Response sent:", replyPacket.Bd.RepBody)
+				// Create reply packet
+				replyPacket := core.CreateReplyPacket(params, 404)
+
+				// Marshall packet
+				b = m.Marshall(replyPacket)
+
+				// Send marshalled packet
+				s.Send(b)
+				log.Print("Response sent:", replyPacket.Bd.RepBody)
+				continue
+			}
+
+			// Send redirected packet
+			s.Send(red)
+
 			continue
 		}
 
