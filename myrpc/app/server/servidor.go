@@ -22,7 +22,7 @@ func main() {
 	calcPort := getPort(scanner)
 	go listenExitCommand(scanner)
 
-	inv := invoker.NewInvoker(shared.LocalHost, calcPort, &locationForwarder, false)
+	inv := invoker.NewInvoker(shared.LocalHost, calcPort, &locationForwarder, true)
 
 	// Invoke services
 	inv.Invoke()

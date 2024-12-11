@@ -22,7 +22,7 @@ func (p *CalculadoraProxy) Som(p1, p2 int) (statusCode int, content shared.Reply
 	params[1] = p2
 
 	// Configure remote request
-	req := shared.Request{ObjKey: "Calculadora", Op: "Som", Params: params}
+	req := shared.Request{ObjKey: "Calculadora1", Op: "Som", Params: params}
 
 	// Prepare invocation to Requestor
 	inv := shared.Invocation{Ior: p.Ior, Request: req}
@@ -43,7 +43,7 @@ func (p *CalculadoraProxy) Dif(p1, p2 int) (statusCode int, content shared.Reply
 	params[1] = p2
 
 	// Configure remote request
-	req := shared.Request{ObjKey: "Calculadora", Op: "Dif", Params: params}
+	req := shared.Request{ObjKey: "Calculadora1", Op: "Dif", Params: params}
 
 	// Prepare invocation to Requestor
 	inv := shared.Invocation{Ior: p.Ior, Request: req}

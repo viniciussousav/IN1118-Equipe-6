@@ -16,7 +16,7 @@ type LocationForwarder struct {
 func NewLocationForwarder() LocationForwarder {
 	return LocationForwarder{
 		RemoteLocations: map[string]shared.IOR{
-			"Calculadora": {Host: "localhost", Port: 8082},
+			"Calculadora1": {Host: "localhost", Port: 8082},
 		},
 	}
 }

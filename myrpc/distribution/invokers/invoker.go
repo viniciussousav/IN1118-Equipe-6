@@ -19,7 +19,7 @@ type Invoker struct {
 func NewInvoker(host string, port int, locationForwarder *interceptors.LocationForwarder, redirect bool) Invoker {
 
 	localObject := map[string]interface{}{
-		"Calculadora": businesses.Calculadora{},
+		"Calculadora1": businesses.Calculadora{},
 	}
 
 	return Invoker{
@@ -51,7 +51,7 @@ func (i Invoker) Invoke() {
 
 		if !exists && i.redirect {
 
-			red, err := i.locationForwarder.ForwardRequest("Calculadora", b)
+			red, err := i.locationForwarder.ForwardRequest(r.ObjKey, b)
 
 			if err != nil {
 				// Prepare reply
@@ -77,7 +77,7 @@ func (i Invoker) Invoke() {
 		}
 
 		if !exists && !i.redirect {
-			newLocation, err := i.locationForwarder.GetLocation("Calculadora")
+			newLocation, err := i.locationForwarder.GetLocation(r.ObjKey)
 			if err != nil {
 				// Prepare reply
 				var params []interface{}
@@ -109,7 +109,7 @@ func (i Invoker) Invoke() {
 			continue
 		}
 
-		if r.ObjKey == "Calculadora" {
+		if r.ObjKey == "Calculadora1" {
 
 			calc := c.(businesses.Calculadora)
 
