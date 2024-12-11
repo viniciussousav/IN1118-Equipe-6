@@ -51,8 +51,12 @@ func listenCommand(scanner *bufio.Scanner, invoker *invoker.Invoker) {
 		case "2":
 			fmt.Print("Type the calculator name to remove: ")
 			scanner.Scan()
-			invoker.RemoveLocalObject(scanner.Text())
-			fmt.Println("Calculator removed.")
+			calculatorToRemove := scanner.Text()
+			fmt.Print("Type the new port: ")
+			scanner.Scan()
+			newPort, _ := strconv.Atoi(scanner.Text())
+			invoker.RemoveLocalObject(calculatorToRemove, shared.IOR{Host: shared.LocalHost, Port: newPort})
+			fmt.Println("Calculator migrated from server.")
 		default:
 			fmt.Println("Unknown command")
 		}

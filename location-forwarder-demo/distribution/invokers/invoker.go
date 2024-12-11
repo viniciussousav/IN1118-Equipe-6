@@ -114,6 +114,7 @@ func (i *Invoker) AddLocalObject(objKey string, objImpl interface{}) {
 	i.localObjects[objKey] = objImpl
 }
 
-func (i *Invoker) RemoveLocalObject(objKey string) {
+func (i *Invoker) RemoveLocalObject(objKey string, newIor shared.IOR) {
 	delete(i.localObjects, objKey)
+	i.locationForwarder.AddLocation(objKey, newIor)
 }
