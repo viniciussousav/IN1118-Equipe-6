@@ -28,7 +28,7 @@ type RequestHeader struct {
 	Context          string
 	RequestId        int
 	ResponseExpected bool
-	ObjectKey        int
+	ObjectKey        string
 	Operation        string
 }
 
@@ -46,27 +46,27 @@ type ReplyBody struct {
 	OperationResult []interface{}
 }
 
-func CreateRequestPackage(op string, p []interface{}) Packet {
-	r := Packet{}
-
-	miopHeader := Header{}
-	miopBody := Body{}
-	reqHeader := RequestHeader{Operation: op}
-	reqBody := RequestBody{Body: p}
-	miopBody = Body{ReqHeader: reqHeader, ReqBody: reqBody}
-
-	r.Hdr = miopHeader
-	r.Bd = miopBody
-
-	return r
-}
-
-func CreateReplyPacket(params []interface{}) Packet {
+func CreateRequestPackage(objKey string, op string, p []interface{}) Packet {
 	r := Packet{}
 
 	header := Header{}
 	body := Body{}
-	repHeader := ReplyHeader{"", 1313, 1} // TODO
+	reqHeader := RequestHeader{Operation: op, ObjectKey: objKey}
+	reqBody := RequestBody{Body: p}
+	body = Body{ReqHeader: reqHeader, ReqBody: reqBody}
+
+	r.Hdr = header
+	r.Bd = body
+
+	return r
+}
+
+func CreateReplyPacket(params []interface{}, status int) Packet {
+	r := Packet{}
+
+	header := Header{}
+	body := Body{}
+	repHeader := ReplyHeader{"", 1313, status} // TODO
 	repBody := ReplyBody{OperationResult: params}
 	body = Body{RepHeader: repHeader, RepBody: repBody}
 
@@ -81,6 +81,7 @@ func ExtractRequest(m Packet) shared.Request {
 
 	i.Op = m.Bd.ReqHeader.Operation
 	i.Params = m.Bd.ReqBody.Body
+	i.ObjKey = m.Bd.ReqHeader.ObjectKey
 
 	return i
 }

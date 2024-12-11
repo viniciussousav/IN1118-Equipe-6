@@ -36,7 +36,7 @@ func (srh *ServerRequestHandler) Receive() []byte {
 
 	srh.Connection, err = srh.Ln.Accept()
 	if err != nil {
-		log.Fatalf("ServerRequestHandler 1:: %s", err)
+		log.Fatalf("ServerRequestHandler:: Error receiving message's size %s", err)
 	}
 
 	// 2: receive message's size
@@ -47,7 +47,7 @@ func (srh *ServerRequestHandler) Receive() []byte {
 			srh.Connection.Close()
 			return nil
 		} else {
-			log.Fatalf("ServerRequestHandler 2:: %s", err)
+			log.Fatalf("ServerRequestHandler:: Error receiving message's size: %s", err)
 		}
 	}
 	sizeInt := binary.LittleEndian.Uint32(size)
@@ -60,7 +60,7 @@ func (srh *ServerRequestHandler) Receive() []byte {
 			srh.Connection.Close()
 			return nil
 		} else {
-			log.Fatalf("ServerRequestHandler 3:: %s", err)
+			log.Fatalf("ServerRequestHandler:: Error receiving message: %s", err)
 		}
 	}
 	return msg

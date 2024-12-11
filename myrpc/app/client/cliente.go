@@ -6,15 +6,16 @@ import (
 	"os"
 	"strconv"
 	"test/myrpc/distribution/proxies"
-	namingproxy "test/myrpc/services/naming/proxy"
 	"test/shared"
 )
 
 func main() {
 
-	naming := namingproxy.New(shared.LocalHost, shared.NamingPort)
-	calc := proxies.NewCalculadoraProxy(naming.Find("Calculadora"))
+	calc := proxies.NewCalculadoraProxy(shared.IOR{Host: shared.LocalHost, Port: 8080})
+	listenUserInput(calc)
+}
 
+func listenUserInput(calc proxies.CalculadoraProxy) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -22,15 +23,31 @@ func main() {
 
 		fmt.Print("Type first number: ")
 		scanner.Scan()
-		a, _ = strconv.Atoi(scanner.Text())
+		a, err := strconv.Atoi(scanner.Text())
+		if err != nil {
+			fmt.Printf("error reading input 'a': %s", err)
+			continue
+		}
 
 		fmt.Print("Type second number: ")
 		scanner.Scan()
-		b, _ = strconv.Atoi(scanner.Text())
+		b, err = strconv.Atoi(scanner.Text())
+		if err != nil {
+			fmt.Printf("error reading input 'b': %s", err)
+			continue
+		}
 
-		res := calc.Som(a, b)
-		fmt.Println("Response: ", res)
+		statusCode, res := calc.Som(a, b)
 
-		fmt.Println()
+		if statusCode == 200 {
+			fmt.Printf("StatusCode: %d, Result: %.2f \n", statusCode, res.Result[0].(float64))
+		} else if statusCode == 301 {
+			newLocationPort := res.Result[0].(int)
+			redirectProxy := proxies.NewCalculadoraProxy(shared.IOR{Host: shared.LocalHost, Port: newLocationPort})
+			statusCode, res = redirectProxy.Som(a, b)
+			fmt.Printf("Result: %.2f \n", res.Result[0].(float64))
+		} else {
+			fmt.Printf("StatusCode: %d, Error: %s \n", statusCode, res.Result[0].(string))
+		}
 	}
 }
