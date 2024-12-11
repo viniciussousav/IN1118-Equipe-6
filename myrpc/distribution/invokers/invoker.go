@@ -18,7 +18,7 @@ type Invoker struct {
 func NewInvoker(host string, port int, locationForwarder *interceptors.LocationForwarder) Invoker {
 
 	localObject := map[string]interface{}{
-		"Calculadora": businesses.Calculadora{},
+		"Calculadora1": businesses.Calculadora{},
 	}
 
 	return Invoker{
@@ -34,8 +34,6 @@ func (i Invoker) Invoke() {
 
 	var rep int
 
-	c := businesses.Calculadora{}
-
 	for {
 		// Invoke ServerRequestHandler
 		b := s.Receive()
@@ -47,7 +45,28 @@ func (i Invoker) Invoke() {
 		r := core.ExtractRequest(packet)
 		log.Print("Request received:", r)
 
+		c, exists := i.localObjects[r.ObjKey]
+
+		if !exists {
+			// Prepare reply
+			var params []interface{}
+			params = append(params, "object not found")
+
+			// Create reply packet
+			replyPacket := core.CreateReplyPacket(params, 404)
+
+			// Marshall packet
+			b = m.Marshall(replyPacket)
+
+			// Send marshalled packet
+			s.Send(b)
+			log.Print("Response sent:", replyPacket.Bd.RepBody)
+			continue
+		}
+
 		if r.ObjKey == "Calculadora" {
+
+			calc := c.(businesses.Calculadora)
 
 			_p1 := int(r.Params[0].(float64))
 			_p2 := int(r.Params[1].(float64))
@@ -55,13 +74,13 @@ func (i Invoker) Invoke() {
 			// Demultiplex request & invoke Location Forwarder
 			switch r.Op {
 			case "Som":
-				rep = c.Som(_p1, _p2)
+				rep = calc.Som(_p1, _p2)
 			case "Dif":
-				rep = c.Dif(_p1, _p2)
+				rep = calc.Dif(_p1, _p2)
 			case "Mul":
-				rep = c.Mul(_p1, _p2)
+				rep = calc.Mul(_p1, _p2)
 			case "Div":
-				rep = c.Div(_p1, _p2)
+				rep = calc.Div(_p1, _p2)
 			default:
 				log.Fatal("Invoker:: Operation '" + r.Op + "' is unknown:: ")
 			}

@@ -1,7 +1,6 @@
 package proxies
 
 import (
-	"log"
 	"test/myrpc/distribution/requestor"
 	"test/shared"
 )
@@ -32,12 +31,11 @@ func (p *CalculadoraProxy) Som(p1, p2 int) (statusCode int, content shared.Reply
 	requestor := requestor.Requestor{}
 	r := requestor.Invoke(inv)
 
-	log.Print(r)
 	//4. Return something to the publisher
 	return r.Status, r.Rep
 }
 
-func (p *CalculadoraProxy) Dif(p1, p2 int) int {
+func (p *CalculadoraProxy) Dif(p1, p2 int) (statusCode int, content shared.Reply) {
 
 	// 1. Configure input parameters
 	params := make([]interface{}, 2)
@@ -55,5 +53,5 @@ func (p *CalculadoraProxy) Dif(p1, p2 int) int {
 	r := requestor.Invoke(inv)
 
 	//4. Return something to the publisher
-	return int(r.Rep.Result[0].(float64)) // TODO
+	return r.Status, r.Rep
 }
