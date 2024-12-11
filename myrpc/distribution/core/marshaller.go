@@ -9,9 +9,7 @@ import (
 type Marshaller struct{}
 
 func (Marshaller) Marshall(msg Packet) []byte {
-
 	r, err := json.Marshal(msg)
-	//r, err := msgpack.Marshal(msg)
 	if err != nil {
 		log.Fatalf("Marshaller:: Marshall:: %s", err)
 	}
@@ -20,10 +18,8 @@ func (Marshaller) Marshall(msg Packet) []byte {
 }
 
 func (Marshaller) Unmarshall(msg []byte) Packet {
-
 	r := Packet{}
 	err := json.Unmarshal(msg, &r)
-	//err := msgpack.Unmarshal(msg, &r)
 	if err != nil {
 		log.Fatalf("Marshaller:: Unmarshall:: %s", err)
 	}
@@ -32,6 +28,5 @@ func (Marshaller) Unmarshall(msg []byte) Packet {
 
 func (Marshaller) MarshallerFactory() Marshaller {
 	gob.Register(Packet{})
-
 	return Marshaller{}
 }
