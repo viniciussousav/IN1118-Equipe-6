@@ -14,7 +14,6 @@ type ServerRequestHandler struct {
 	Ln         net.Listener
 }
 
-// var conn net.Conn
 var err error
 
 func NewServerRequestHandler(h string, p int) *ServerRequestHandler {
@@ -23,7 +22,7 @@ func NewServerRequestHandler(h string, p int) *ServerRequestHandler {
 	r.Host = h
 	r.Port = p
 	r.Connection = nil
-	// 1: create listener & accept connection
+
 	r.Ln, err = net.Listen("tcp", h+":"+strconv.Itoa(p))
 	if err != nil {
 		log.Fatalf("ServerRequestHandler 0:: %s", err)
@@ -39,7 +38,7 @@ func (srh *ServerRequestHandler) Receive() []byte {
 		log.Fatalf("ServerRequestHandler:: Error receiving message's size %s", err)
 	}
 
-	// 2: receive message's size
+	// receive message's size
 	size := make([]byte, 4)
 	_, err = srh.Connection.Read(size)
 	if err != nil {
@@ -52,7 +51,7 @@ func (srh *ServerRequestHandler) Receive() []byte {
 	}
 	sizeInt := binary.LittleEndian.Uint32(size)
 
-	// 3: receive message
+	// receive message
 	msg := make([]byte, sizeInt)
 	_, err = srh.Connection.Read(msg)
 	if err != nil {
@@ -68,7 +67,7 @@ func (srh *ServerRequestHandler) Receive() []byte {
 
 func (srh *ServerRequestHandler) Send(msgToClient []byte) {
 
-	// 2: send message's size
+	// send message's size
 	size := make([]byte, 4)
 	l := uint32(len(msgToClient))
 	binary.LittleEndian.PutUint32(size, l)
@@ -82,7 +81,7 @@ func (srh *ServerRequestHandler) Send(msgToClient []byte) {
 		}
 	}
 
-	// 3: send message
+	// end message
 	_, err = srh.Connection.Write(msgToClient)
 	if err != nil {
 		if _, ok := err.(*net.OpError); ok {
@@ -93,6 +92,4 @@ func (srh *ServerRequestHandler) Send(msgToClient []byte) {
 			log.Fatalf("ServerRequestHandler 5:: %s", err)
 		}
 	}
-	//defer srh.Connection.Close()
-	//defer srh.Ln.Close()
 }

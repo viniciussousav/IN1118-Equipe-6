@@ -35,7 +35,7 @@ func (crh *ClientRequestHandler) Handle(msgToServer []byte) []byte {
 			continue
 		}
 
-		// 2: send message's size
+		// end message's size
 		sizeMsgToServer := make([]byte, 4)
 		l := uint32(len(msgToServer))
 		binary.LittleEndian.PutUint32(sizeMsgToServer, l)
@@ -44,13 +44,13 @@ func (crh *ClientRequestHandler) Handle(msgToServer []byte) []byte {
 			log.Fatalf("ClientRequestHandler 1:: %s", err)
 		}
 
-		// 3: send message
+		// send message
 		_, err = crh.Connection.Write(msgToServer)
 		if err != nil {
 			log.Fatalf("ClientRequestHandler 2:: %s", err)
 		}
 
-		// 4: receive message's size
+		// receive message's size
 		sizeMsgFromServer := make([]byte, 4)
 		_, err = crh.Connection.Read(sizeMsgFromServer)
 		if err != nil {
@@ -58,7 +58,7 @@ func (crh *ClientRequestHandler) Handle(msgToServer []byte) []byte {
 		}
 		sizeFromServerInt := binary.LittleEndian.Uint32(sizeMsgFromServer)
 
-		//5: receive reply
+		// receive reply
 		msgFromServer = make([]byte, sizeFromServerInt)
 		_, err = crh.Connection.Read(msgFromServer)
 		if err != nil {

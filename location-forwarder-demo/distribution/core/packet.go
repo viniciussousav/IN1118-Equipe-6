@@ -66,7 +66,7 @@ func CreateReplyPacket(params []interface{}, status int) Packet {
 
 	header := Header{}
 	body := Body{}
-	repHeader := ReplyHeader{"", 1313, status} // TODO
+	repHeader := ReplyHeader{"", 1313, status}
 	repBody := ReplyBody{OperationResult: params}
 	body = Body{RepHeader: repHeader, RepBody: repBody}
 

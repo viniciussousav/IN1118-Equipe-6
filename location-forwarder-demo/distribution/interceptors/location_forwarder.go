@@ -15,9 +15,7 @@ type LocationForwarder struct {
 // NewLocationForwarder Cria uma nova instância do Location Forwarder
 func NewLocationForwarder() LocationForwarder {
 	return LocationForwarder{
-		RemoteLocations: map[string]shared.IOR{
-			"Calculadora1": {Host: "localhost", Port: 8082},
-		},
+		RemoteLocations: map[string]shared.IOR{},
 	}
 }
 
@@ -45,7 +43,7 @@ func (lf *LocationForwarder) ForwardRequest(objectName string, request []byte) (
 	}
 	defer conn.Close()
 
-	// 2: send message's size
+	// send message's size
 	sizeMsgToServer := make([]byte, 4)
 	l := uint32(len(request))
 	binary.LittleEndian.PutUint32(sizeMsgToServer, l)
@@ -54,13 +52,13 @@ func (lf *LocationForwarder) ForwardRequest(objectName string, request []byte) (
 		log.Fatalf("ClientRequestHandler 1:: %s", err)
 	}
 
-	// 3: send message
+	// send message
 	_, err = conn.Write(request)
 	if err != nil {
 		log.Fatalf("ClientRequestHandler 2:: %s", err)
 	}
 
-	// 4: receive message's size
+	// receive message's size
 	sizeMsgFromServer := make([]byte, 4)
 	_, err = conn.Read(sizeMsgFromServer)
 	if err != nil {
@@ -68,7 +66,7 @@ func (lf *LocationForwarder) ForwardRequest(objectName string, request []byte) (
 	}
 	sizeFromServerInt := binary.LittleEndian.Uint32(sizeMsgFromServer)
 
-	//5: receive reply
+	// receive reply
 	msgFromServer := make([]byte, sizeFromServerInt)
 	_, err = conn.Read(msgFromServer)
 	if err != nil {
@@ -76,4 +74,13 @@ func (lf *LocationForwarder) ForwardRequest(objectName string, request []byte) (
 	}
 
 	return msgFromServer, nil
+}
+
+func (lf *LocationForwarder) AddLocation(objKey string, ior shared.IOR) {
+	lf.RemoveLocation(objKey)
+	lf.RemoteLocations[objKey] = ior
+}
+
+func (lf *LocationForwarder) RemoveLocation(objKey string) {
+	delete(lf.RemoteLocations, objKey)
 }
